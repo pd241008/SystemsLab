@@ -86,40 +86,35 @@ int raylibvisualizer() {
     BeginDrawing();
     ClearBackground(BLACK);
 
-    // 1. Reset our starting variables at the beginning of EVERY frame
+  
     BlockHeader *current = global_head;
     int current_x = 30;
 
-    // 2. Traverse the blocks and draw them left-to-right
     while (current != nullptr) {
 
-      // Calculate THIS specific block's width (Header + User Data)
+
       int block_width =
           (int)(((sizeof(BlockHeader) + current->size) / 4096.0f) *
                 (WIDTH - 60));
 
-      // Determine color: Green if allocated (is_free == false), Gray if freed
+
       if (current->is_free == false) {
         DrawRectangle(current_x, 30, block_width, 40, GREEN);
       } else {
         DrawRectangle(current_x, 30, block_width, 40, GRAY);
       }
 
-      // Advance the X coordinate so the next block draws perfectly next to this
-      // one
+     
       current_x += block_width;
 
-      // Move to the next block in the chain
+   
       current = current->next;
     }
 
-    // 3. Draw the remaining untouched heap space
-    // 'current_x' is now sitting exactly where the last block ended.
     int remaining_width = (WIDTH - 30) - current_x;
 
     if (remaining_width > 0) {
-      // I used DARKGRAY here so you can tell the difference between
-      // a "freed" block and "completely untouched" heap space!
+   
       DrawRectangle(current_x, 30, remaining_width, 40, DARKGRAY);
     }
 
