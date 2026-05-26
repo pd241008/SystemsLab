@@ -12,48 +12,125 @@ size_t heap_top = 0;
 
 size_t used_memory() { return heap_top; }
 size_t free_memory() { return sizeof(heap) - heap_top; }
-void *my_malloc(std::size_t size) {
 
-  if (heap_top + size > sizeof(heap)) {
-    return NULL;
+struct BlockHeader {
+  size_t size;
+  bool is_free;
+  BlockHeader *next;
+};
+BlockHeader *global_head = nullptr;
+
+void *my_malloc(std::size_t size) {
+  size_t total_size = sizeof(BlockHeader) + size;
+
+  BlockHeader *current = global_head;
+  while (current != nullptr) {
+
+    if (current->is_free == true && current->size >= size) {
+
+      current->is_free = false;
+
+      return (void *)(current + 1);
+    }
+    current = current->next;
   }
 
-  void *ptr = &heap[heap_top];
-  heap_top += size;
+  if (heap_top + total_size > sizeof(heap)) {
+    return NULL; // Out of memory
+  }
 
-  return ptr;
+  BlockHeader *header = (BlockHeader *)&heap[heap_top];
+  header->size = size;
+  header->is_free = false;
+  header->next = nullptr;
+
+  if (global_head == nullptr) {
+    global_head = header;
+  } else {
+
+    BlockHeader *tail = global_head;
+    while (tail->next != nullptr) {
+      tail = tail->next;
+    }
+    tail->next = header;
+  }
+
+  heap_top += total_size;
+
+  return (void *)(header + 1);
 }
 
 void custom_reset() {
-  heap_top = 0;
+  heap_top = std::size_t(NULL);
   std::memset(heap, 0, sizeof(heap));
 }
 
+void traversal(BlockHeader *head) {
+
+  BlockHeader *current = head;
+
+  while (current != nullptr) {
+
+    std::cout << "Block size: " << current->size
+              << " | Is free: " << (current->is_free ? "Yes" : "No")
+              << std::endl;
+
+    current = current->next;
+  }
+}
 int raylibvisualizer() {
-
-  InitWindow(WIDTH, HEIGHT, "Heap");
-
+  InitWindow(WIDTH, HEIGHT, "Heap Visualizer");
   SetTargetFPS(60);
 
   while (!WindowShouldClose()) {
     BeginDrawing();
     ClearBackground(BLACK);
-    // Scale to window width
-    int allocated_w = (int)((heap_top / 4096.0f) * (WIDTH - 60));
-    int free_w = (WIDTH - 60) - allocated_w;
 
-    DrawRectangle(30, 30, allocated_w, 40, GREEN);
-    DrawRectangle(30 + allocated_w, 30, free_w, 40, GRAY);
+    // 1. Reset our starting variables at the beginning of EVERY frame
+    BlockHeader *current = global_head;
+    int current_x = 30;
+
+    // 2. Traverse the blocks and draw them left-to-right
+    while (current != nullptr) {
+
+      // Calculate THIS specific block's width (Header + User Data)
+      int block_width =
+          (int)(((sizeof(BlockHeader) + current->size) / 4096.0f) *
+                (WIDTH - 60));
+
+      // Determine color: Green if allocated (is_free == false), Gray if freed
+      if (current->is_free == false) {
+        DrawRectangle(current_x, 30, block_width, 40, GREEN);
+      } else {
+        DrawRectangle(current_x, 30, block_width, 40, GRAY);
+      }
+
+      // Advance the X coordinate so the next block draws perfectly next to this
+      // one
+      current_x += block_width;
+
+      // Move to the next block in the chain
+      current = current->next;
+    }
+
+    // 3. Draw the remaining untouched heap space
+    // 'current_x' is now sitting exactly where the last block ended.
+    int remaining_width = (WIDTH - 30) - current_x;
+
+    if (remaining_width > 0) {
+      // I used DARKGRAY here so you can tell the difference between
+      // a "freed" block and "completely untouched" heap space!
+      DrawRectangle(current_x, 30, remaining_width, 40, DARKGRAY);
+    }
+
     EndDrawing();
   }
   CloseWindow();
-
   return 0;
 }
-
 int main(int argc, char *argv[]) {
   int size;
-  std::cout << "Give a Number for Size Allocation Under 4KB" << std::endl;
+  std::cout << "Give a Number for Size Allocation Under 4KB: " << std::endl;
   std::cin >> size;
 
   void *ptr = my_malloc(size);
@@ -61,6 +138,10 @@ int main(int argc, char *argv[]) {
     std::cout << "Allocation failed" << std::endl;
     return 1;
   }
+  traversal(global_head);
+  std::cout << "Successfully allocated " << size << " bytes." << std::endl;
+  std::cout << "Total heap consumed: " << used_memory() << " bytes."
+            << std::endl;
 
   raylibvisualizer();
   return 0;
