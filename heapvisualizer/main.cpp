@@ -22,7 +22,6 @@ BlockHeader *global_head = nullptr;
 
 void *my_malloc(std::size_t size) {
   size_t total_size = sizeof(BlockHeader) + size;
-
   BlockHeader *current = global_head;
   while (current != nullptr) {
 
@@ -78,43 +77,73 @@ void traversal(BlockHeader *head) {
     current = current->next;
   }
 }
+
+void coalesec(BlockHeader *block) {
+  BlockHeader *current = global_head;
+
+  while (block->next != nullptr && block->next->is_free) {
+
+    block->size = block->size + sizeof(BlockHeader) + block->next->size;
+    block->next = block->next->next;
+  }
+}
+
+void my_free(void *ptr) {
+  if (ptr == nullptr)
+    return;
+  BlockHeader *header = (BlockHeader *)ptr - 1;
+  header->is_free = true;
+  coalesec(header); // add this
+}
 int raylibvisualizer() {
   InitWindow(WIDTH, HEIGHT, "Heap Visualizer");
   SetTargetFPS(60);
+  void *alloc_stack[100];
+  int stack_top = 0;
 
   while (!WindowShouldClose()) {
     BeginDrawing();
     ClearBackground(BLACK);
-
-  
+    if (IsKeyPressed(KEY_A) && stack_top < 100) {
+      alloc_stack[stack_top] = my_malloc(128);
+      stack_top++;
+    }
+    if (IsKeyPressed(KEY_F) && stack_top > 0) {
+      stack_top--;
+      my_free(alloc_stack[stack_top]);
+      alloc_stack[stack_top] = nullptr;
+    }
+    if (IsKeyPressed(KEY_R)) {
+      custom_reset();
+      global_head = nullptr;
+      stack_top = 0;
+    }
     BlockHeader *current = global_head;
     int current_x = 30;
 
     while (current != nullptr) {
 
-
       int block_width =
           (int)(((sizeof(BlockHeader) + current->size) / 4096.0f) *
                 (WIDTH - 60));
 
-
       if (current->is_free == false) {
         DrawRectangle(current_x, 30, block_width, 40, GREEN);
+        DrawText("Memory Allocated in Stack", 15, 10, 20, BLACK);
       } else {
         DrawRectangle(current_x, 30, block_width, 40, GRAY);
+        DrawText("Memory Freed", current_x, 10, 20, BLACK);
       }
 
-     
       current_x += block_width;
 
-   
       current = current->next;
     }
 
     int remaining_width = (WIDTH - 30) - current_x;
 
     if (remaining_width > 0) {
-   
+
       DrawRectangle(current_x, 30, remaining_width, 40, DARKGRAY);
     }
 
@@ -123,21 +152,8 @@ int raylibvisualizer() {
   CloseWindow();
   return 0;
 }
+
 int main(int argc, char *argv[]) {
-  int size;
-  std::cout << "Give a Number for Size Allocation Under 4KB: " << std::endl;
-  std::cin >> size;
-
-  void *ptr = my_malloc(size);
-  if (ptr == NULL) {
-    std::cout << "Allocation failed" << std::endl;
-    return 1;
-  }
-  traversal(global_head);
-  std::cout << "Successfully allocated " << size << " bytes." << std::endl;
-  std::cout << "Total heap consumed: " << used_memory() << " bytes."
-            << std::endl;
-
   raylibvisualizer();
   return 0;
 }
