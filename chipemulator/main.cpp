@@ -44,6 +44,30 @@ uint8_t fontset[FONTSET_SIZE] =
 	0xF0, 0x80, 0xF0, 0x80, 0xF0, 
 	0xF0, 0x80, 0xF0, 0x80, 0x80  
 };
+
+  pc = Start_Address;
+  I = 0;
+  sp = 0;
+  delay_timer = 0;
+  sound_timer = 0;
+
+  for (int i = 0; i < 4096; i++) {
+    memory[i] = 0;
+  }
+
+  for (int i = 0; i < 16; i++) {
+    V[i] = 0;
+    stack[i] = 0;
+    keypad[i] = false;
+  }
+
+  for (int i = 0; i < 64 * 32; i++) {
+    display[i] = 0;
+  }
+
+  for (unsigned int i = 0; i < FONTSET_SIZE; i++) {
+    memory[0x050 + i] = fontset[i];
+  }
 }
 
 void load_rom(const char *filename) {
@@ -52,6 +76,12 @@ void load_rom(const char *filename) {
 
   if (file.is_open()) {
     std::streampos size = file.tellg();
+    
+    if (size > (4096 - Start_Address)) {
+      std::cerr << "Error: ROM file is too large to fit in memory." << std::endl;
+      return;
+    }
+
     char *buffer = new char[size];
 
     file.seekg(0, std::ios::beg);
@@ -63,9 +93,9 @@ void load_rom(const char *filename) {
     }
 
     delete[] (buffer);
+  } else {
+    std::cerr << "Error: Failed to open ROM file: " << filename << std::endl;
   }
-  // TODO: Open ROM file
-  // TODO: Read file contents into memory starting at address 0x200
 }
 
 void fetch_decode_execute() {
