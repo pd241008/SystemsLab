@@ -1,8 +1,10 @@
-# CHIP-8 Emulator
+# 🕹️ CHIP-8 Emulator
 
 A CHIP-8 emulator and interpreter written in C++ using [raylib](https://www.raylib.com/). This project demonstrates how a simple virtual machine from 1977 operates.
 
-## Overview
+---
+
+## 📖 Overview
 
 CHIP-8 is a virtual machine from 1977. It has:
 - 4KB of memory
@@ -13,31 +15,49 @@ CHIP-8 is a virtual machine from 1977. It has:
 
 You write an interpreter that reads a `.ch8` ROM file, decodes each 2-byte instruction, and executes it — rendering output with Raylib.
 
-### What CHIP-8 will teach you that this project didn't:
+### 🧠 What CHIP-8 will teach you:
 - Bitwise operations (`&`, `|`, `^`, `>>`, `<<`) on raw binary data
 - Opcode decoding — extracting nibbles from 2-byte instructions
 - How a fetch-decode-execute cycle actually works
 - Memory-mapped display buffer
 - How real VMs like JVM and V8 are structured at their core
 
-## Prerequisites
+---
+
+## 🛠️ Prerequisites
 
 - A C++ compiler (e.g., `g++` or `clang++`)
 - [raylib](https://github.com/raysan5/raylib) installed on your system.
 
-## Build and Run
+---
+
+## 🚀 Build and Run
 
 1. Navigate to the emulator directory:
    ```bash
    cd chipemulator
    ```
 
-2. Compile the code. Assuming you are using `g++`, you can run:
+2. Compile the code. It is important to link against all necessary system libraries alongside Raylib:
    ```bash
-   g++ main.cpp -lraylib -o chipemulator
+   g++ main.cpp -o chipemulator -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
    ```
 
-3. Run the executable:
+3. Run the executable by passing a ROM file as an argument:
    ```bash
-   ./chipemulator
+   ./chipemulator path/to/rom.ch8
    ```
+
+---
+
+## 🏗️ Progress
+
+- [x] **Memory & Registers Setup**
+- [x] **ROM Loading**
+- [x] **Fetch-Decode-Execute Loop**
+- [x] **Core Instruction Set (34 Opcodes)**
+- [x] **Raylib Display Rendering**
+- [x] **Keyboard Input Mapping (Hex Keypad)**
+- [x] **Timers (Delay & Sound)**
+- [ ] **Audio Playback** (Beep when sound timer > 0)
+- [ ] **Cross-Platform Build System** (CMake)

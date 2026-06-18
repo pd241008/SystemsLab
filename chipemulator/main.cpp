@@ -294,29 +294,59 @@ void fetch_decode_execute() {
   }
 }
 
-int raylibvisualizer() {
+int raylibvisualizer(const char *rom_path) {
   InitWindow(WIDTH, HEIGHT, "CHIP-8 Emulator");
   SetTargetFPS(60);
 
   initialize();
-
-  // TODO: Remove hardcoded behavior later, load ROM path from args
-  // load_rom("rom.ch8");
+  load_rom(rom_path);
 
   while (!WindowShouldClose()) {
-    // TODO: Handle input for keypad (map keys to CHIP-8 0-F keys)
+    // Handle input for keypad (map keys to CHIP-8 0-F keys)
+    keypad[0x1] = IsKeyDown(KEY_ONE);
+    keypad[0x2] = IsKeyDown(KEY_TWO);
+    keypad[0x3] = IsKeyDown(KEY_THREE);
+    keypad[0xC] = IsKeyDown(KEY_FOUR);
 
-    // TODO: Emulate a cycle (call fetch_decode_execute)
-    // Note: You may need to call it multiple times per frame for proper clock
-    // speed
+    keypad[0x4] = IsKeyDown(KEY_Q);
+    keypad[0x5] = IsKeyDown(KEY_W);
+    keypad[0x6] = IsKeyDown(KEY_E);
+    keypad[0xD] = IsKeyDown(KEY_R);
 
-    // TODO: Update timers (decrement delay_timer and sound_timer at 60Hz)
+    keypad[0x7] = IsKeyDown(KEY_A);
+    keypad[0x8] = IsKeyDown(KEY_S);
+    keypad[0x9] = IsKeyDown(KEY_D);
+    keypad[0xE] = IsKeyDown(KEY_F);
+
+    keypad[0xA] = IsKeyDown(KEY_Z);
+    keypad[0x0] = IsKeyDown(KEY_X);
+    keypad[0xB] = IsKeyDown(KEY_C);
+    keypad[0xF] = IsKeyDown(KEY_V);
+
+    // Emulate cycles (call fetch_decode_execute multiple times per frame for proper clock speed)
+    for (int i = 0; i < 12; i++) {
+        fetch_decode_execute();
+    }
+
+    // Update timers (decrement delay_timer and sound_timer at 60Hz)
+    if (delay_timer > 0) {
+        delay_timer--;
+    }
+    if (sound_timer > 0) {
+        sound_timer--;
+    }
 
     BeginDrawing();
     ClearBackground(BLACK);
 
-    // TODO: Render the 64x32 display array using DrawRectangle for each ON
-    // pixel
+    // Render the 64x32 display array using DrawRectangle for each ON pixel
+    for (int i = 0; i < 64 * 32; i++) {
+        if (display[i] == 1) {
+            int x = (i % 64) * SCALE;
+            int y = (i / 64) * SCALE;
+            DrawRectangle(x, y, SCALE, SCALE, WHITE);
+        }
+    }
 
     EndDrawing();
   }
@@ -326,7 +356,11 @@ int raylibvisualizer() {
 }
 
 int main(int argc, char *argv[]) {
-  // TODO: Parse command-line arguments to pass ROM file path to load_rom
-  raylibvisualizer();
+  // Parse command-line arguments to pass ROM file path to load_rom
+  if (argc != 2) {
+      std::cerr << "Usage: " << argv[0] << " <rom_file>" << std::endl;
+      return 1;
+  }
+  raylibvisualizer(argv[1]);
   return 0;
 }
