@@ -297,6 +297,8 @@ void fetch_decode_execute() {
 int raylibvisualizer(const char *rom_path) {
   InitWindow(WIDTH, HEIGHT, "CHIP-8 Emulator");
   SetTargetFPS(60);
+  InitAudioDevice();
+  Sound beep = LoadSound("beep.wav");
 
   initialize();
   load_rom(rom_path);
@@ -333,7 +335,14 @@ int raylibvisualizer(const char *rom_path) {
         delay_timer--;
     }
     if (sound_timer > 0) {
+        if (!IsSoundPlaying(beep)) {
+            PlaySound(beep);
+        }
         sound_timer--;
+    } else {
+        if (IsSoundPlaying(beep)) {
+            StopSound(beep);
+        }
     }
 
     BeginDrawing();
@@ -351,6 +360,8 @@ int raylibvisualizer(const char *rom_path) {
     EndDrawing();
   }
 
+  UnloadSound(beep);
+  CloseAudioDevice();
   CloseWindow();
   return 0;
 }

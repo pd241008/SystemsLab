@@ -38,9 +38,11 @@ You write an interpreter that reads a `.ch8` ROM file, decodes each 2-byte instr
    cd chipemulator
    ```
 
-2. Compile the code. It is important to link against all necessary system libraries alongside Raylib:
+2. Build using CMake:
    ```bash
-   g++ main.cpp -o chipemulator -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
+   mkdir build && cd build
+   cmake ..
+   make
    ```
 
 3. Run the executable by passing a ROM file as an argument:
@@ -59,5 +61,5 @@ You write an interpreter that reads a `.ch8` ROM file, decodes each 2-byte instr
 - [x] **Raylib Display Rendering**
 - [x] **Keyboard Input Mapping (Hex Keypad)**
 - [x] **Timers (Delay & Sound)**
-- [ ] **Audio Playback** (Beep when sound timer > 0)
-- [ ] **Cross-Platform Build System** (CMake)
+- [x] **Audio Playback** (Beep when sound timer > 0)
+- [x] **Cross-Platform Build System** (CMake)
