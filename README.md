@@ -1,32 +1,47 @@
-# C++ Systems Programming Projects
+<div align="center">
 
-A collection of systems programming projects in C++ — allocators, emulators, renderers, and tools built from scratch.
+# Visualizer
 
-This repository serves as a playground for exploring low-level concepts, memory management, computer architecture, and computer graphics. It is designed to provide hands-on, built-from-scratch implementations to better understand the inner workings of complex systems. Where appropriate, projects feature real-time graphical representations using [raylib](https://www.raylib.com/).
+**A collection of systems programming projects exploring memory management, computer architecture, and OS-level integrations.**
 
-## Current Projects
+[![C++](https://img.shields.io/badge/c++-black?style=flat-square&logo=c%2B%2B)](https://isocpp.org/)
+[![Rust](https://img.shields.io/badge/rust-black?style=flat-square&logo=rust)](https://www.rust-lang.org/)
+[![Status](https://img.shields.io/badge/status-building-orange?style=flat-square)]()
 
-### 1. Heap Visualizer (`heapvisualizer/`)
-A custom heap allocator (with `my_malloc` and `my_free`) over a fixed-size `uint8_t` array, providing an interactive, real-time graphical representation of the heap's memory layout.
+</div>
 
-**Features:**
-- **Custom Memory Allocator**: Implements dynamic allocation and traverses the heap using block headers, supporting basic free, allocated block management, and memory coalescing.
-- **Graphical Visualization**: 
-  - **Green blocks**: Allocated memory.
-  - **Gray blocks**: Freed memory.
-  - **Dark Gray blocks**: Untouched/Unallocated memory space.
+---
 
-See the [heapvisualizer README](heapvisualizer/README.md) for more detailed instructions and controls.
+## What This Is
 
-## Prerequisites
+This repository serves as a practical playground for exploring low-level concepts through hands-on, built-from-scratch implementations. Where appropriate, projects feature real-time graphical representations using raylib to visualize the inner workings of complex systems.
 
-To compile and run the projects in this repository, you generally need:
-- A C++ compiler (like `g++` or `clang++`)
-- [raylib](https://github.com/raysan5/raylib) installed on your system (for visually interactive projects).
+> **Design constraint:** Building raw memory allocators, virtual machine execution loops, and cross-kernel synchronization primitives from the ground up without relying on high-level abstractions.
 
-## Expanding the Library
+---
 
-This project is built to grow! If you want to add a new systems programming project (e.g., a simple CPU emulator, a software rasterizer, or a new allocator type):
-1. Create a new directory for your concept.
-2. Write your implementation (optionally using `raylib` for visualization).
-3. Update this README's **Current Projects** section to list your newly added module.
+## Quickstart
+
+```bash
+git clone https://github.com/pd241008/Visualizer
+cd Visualizer
+
+# Navigate to a specific project to build and run
+cd chipemulator
+mkdir build && cd build && cmake .. && make
+./chipemulator path/to/rom.ch8
+```
+
+---
+
+## Projects
+
+| Project | Description | State |
+| ------- | ----------- | ----- |
+| **`heapvisualizer`** | Custom heap allocator (`my_malloc`/`my_free`) with interactive real-time memory visualization via raylib. | ✅ Stable |
+| **`chipemulator`** | CHIP-8 virtual machine interpreter with a fetch-decode-execute loop and raylib rendering. | 🔨 Building |
+| **`clipsync`** | Two-way, real-time clipboard sync between Windows and WSL2 via mmap'd state and spinlocks. | 🚧 Early Design |
+
+---
+
+_[pd241008](https://github.com/pd241008) · [ct-os-dev-portfolio.vercel.app](https://ct-os-dev-portfolio.vercel.app)_
