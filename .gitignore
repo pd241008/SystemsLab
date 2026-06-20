@@ -26,3 +26,26 @@
 a.out
 game
 visualizer
+
+# Rust / Cargo
+**/target/
+target/
+**/*.rs.bk
+
+# CMake / C++ Builds
+build/
+**/build/
+cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Makefile
+cmake_install.cmake
+compile_commands.json
+
+# OS / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
